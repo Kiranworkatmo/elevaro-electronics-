@@ -1,7 +1,5 @@
-'use client';
-
 import React from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CATEGORIES } from '@/data/categories';
@@ -9,10 +7,18 @@ import { PRODUCTS } from '@/data/products';
 import ProductCard from '@/components/ProductCard';
 import { Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
-export default function CategoryPage() {
-  const params = useParams();
-  const slug = params?.slug as string;
+export function generateStaticParams() {
+  return CATEGORIES.map((category) => ({
+    slug: category.id,
+  }));
+}
 
+interface CategoryPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { slug } = await params;
   const category = CATEGORIES.find((c) => c.id === slug);
 
   if (!category) {
