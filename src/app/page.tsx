@@ -1,59 +1,41 @@
 'use client';
 
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import BrandHallmarks from '@/components/BrandHallmarks';
-import CuratedCollections from '@/components/CuratedCollections';
-import ProductCatalog from '@/components/ProductCatalog';
-import AtelierStory from '@/components/AtelierStory';
-import BridalConciergeSection from '@/components/BridalConciergeSection';
-import RealBridesGallery from '@/components/RealBridesGallery';
-import BoutiqueLocator from '@/components/BoutiqueLocator';
-import Footer from '@/components/Footer';
+import React from 'react';
+import Hero from '@/components/home/Hero';
+import FeaturedCategories from '@/components/home/FeaturedCategories';
+import BestSellers from '@/components/home/BestSellers';
+import PromotionalBanner from '@/components/home/PromotionalBanner';
+import NewArrivals from '@/components/home/NewArrivals';
+import InnovationShowcase from '@/components/home/InnovationShowcase';
+import WhyChooseElevaro from '@/components/home/WhyChooseElevaro';
+import CustomerReviews from '@/components/home/CustomerReviews';
 
-export default function Home() {
-  const [activeWeaveFilter, setActiveWeaveFilter] = useState<string>('All');
-
-  const handleSelectCollection = (weaveName: string) => {
-    setActiveWeaveFilter(weaveName);
-    const catalogElement = document.getElementById('catalog');
-    if (catalogElement) {
-      catalogElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col bg-[#0E1013] text-[#ECE4D8]">
-      {/* Top Navigation */}
-      <Navbar />
-
-      {/* Haute Couture Hero Showcase */}
+    <main className="min-h-screen flex flex-col bg-[#080808]">
+      {/* Hero Showcase */}
       <Hero />
 
-      {/* 4 Sovereign Hallmarks (Silk Mark, Pit-Looms, Salon, Delivery) */}
-      <BrandHallmarks />
+      {/* 9 Curated Featured Categories */}
+      <FeaturedCategories />
 
-      {/* Curated Ateliers Editorial Grid */}
-      <CuratedCollections onSelectCollection={handleSelectCollection} />
+      {/* Best Sellers Showcase with category tabs */}
+      <BestSellers />
 
-      {/* Main Interactive Product Treasury & Filters */}
-      <ProductCatalog initialWeaveFilter={activeWeaveFilter} />
+      {/* Promotional Banner with Coupon Code */}
+      <PromotionalBanner />
 
-      {/* The Loom of Generations: 4-Stage Atelier Craft Story */}
-      <AtelierStory />
+      {/* New Arrivals Showcase */}
+      <NewArrivals />
 
-      {/* Privé Bridal Concierge Salon Suite */}
-      <BridalConciergeSection />
+      {/* Interactive Deep-Dive: Titanium, Silicon, Beryllium */}
+      <InnovationShowcase />
 
-      {/* Real Brides of Kiran Sarees & Press Spotlight */}
-      <RealBridesGallery />
+      {/* Why Choose ELEVARO: 6 Core Pillars */}
+      <WhyChooseElevaro />
 
-      {/* Flagship Boutiques (Mumbai, Delhi, Hyderabad) */}
-      <BoutiqueLocator />
-
-      {/* Grand Imperial Footer */}
-      <Footer />
+      {/* Customer Reviews & Testimonials */}
+      <CustomerReviews />
     </main>
   );
 }

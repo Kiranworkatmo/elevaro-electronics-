@@ -1,6 +1,7 @@
 {
-  "name": "kiransarees",
-  "version": "0.1.0",
+  "name": "elevaro-electronics",
+  "version": "1.0.0",
+  "description": "ELEVARO ELECTRONICS - Premium Luxury Technology E-Commerce Platform",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,18 +10,23 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^14.14.0",
+    "lucide-react": "^0.468.0",
     "next": "15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "lucide-react": "^0.468.0"
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "typescript": "^5",
-    "tailwindcss": "^3.4.17",
+    "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
-    "autoprefixer": "^10.4.20"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5"
   }
 }

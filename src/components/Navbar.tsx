@@ -1,342 +1,461 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import ElevaroLogo from '@/components/ElevaroLogo';
 import { useShop } from '@/context/ShopContext';
-import { Currency } from '@/types/saree';
+import { CATEGORIES } from '@/data/categories';
 import {
   Search,
   Heart,
   ShoppingBag,
+  User,
   Menu,
   X,
-  PhoneCall,
-  Sparkles,
+  Layers,
   ChevronDown,
-  Globe,
-  Award
+  ArrowRight,
+  Shield,
+  Sparkles,
+  LogOut,
+  Package,
+  MapPin,
+  SlidersHorizontal,
 } from 'lucide-react';
 
-const CURRENCIES: Currency[] = ['INR', 'USD', 'GBP', 'EUR', 'AED'];
-
 export default function Navbar() {
+  const pathname = usePathname();
   const {
-    currency,
-    setCurrency,
     cartCount,
+    wishlistCount,
+    compareList,
     openCart,
-    wishlist,
     openWishlist,
     openSearch,
-    openConsultation,
-    openWhatsAppConcierge
+    user,
+    isAuthenticated,
+    logout,
   } = useShop();
 
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCategoryMegaMenuOpen, setIsCategoryMegaMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsCategoryMegaMenuOpen(false);
+    setIsUserDropdownOpen(false);
+  }, [pathname]);
+
   return (
-    <>
-      {/* Top Royal Announcement Bar */}
-      <div className="bg-[#170507] text-[#D5B35B] text-[11px] sm:text-xs font-medium tracking-[0.18em] uppercase py-2 px-4 border-b border-[#C59B27]/20 flex items-center justify-between z-50 relative">
-        <div className="hidden lg:flex items-center space-x-2 text-[#ECE4D8]/80">
-          <Award className="w-3.5 h-3.5 text-[#C59B27]" />
-          <span>Silk Mark Certified Handlooms • Tested Gold Zari</span>
-        </div>
-        <div className="flex-1 text-center truncate px-2">
-          <span className="text-[#F6E7B9] font-serif font-normal italic lowercase tracking-normal text-sm sm:text-base mr-2">privé service:</span>
-          <span>Complimentary Insured White-Glove Worldwide Delivery</span>
-        </div>
-        <div className="hidden sm:flex items-center space-x-4">
-          <button
-            onClick={() => openWhatsAppConcierge()}
-            className="hover:text-[#FDF4D4] transition-colors flex items-center space-x-1"
-          >
-            <PhoneCall className="w-3 h-3 text-[#C59B27]" />
-            <span>Stylist WhatsApp</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Luxury Header */}
-      <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-[#0E1013]/95 backdrop-blur-md shadow-2xl border-b border-[#C59B27]/25 py-3'
-            : 'bg-gradient-to-b from-[#0E1013] via-[#0E1013]/90 to-transparent border-b border-[#C59B27]/15 py-4'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Left Nav Links - Desktop */}
-            <nav className="hidden lg:flex items-center space-x-8 text-xs tracking-[0.2em] uppercase font-medium text-[#ECE4D8]/80">
-              <a
-                href="#collections"
-                className="hover:text-[#C59B27] transition-colors relative py-1 group"
-              >
-                Collections
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C59B27] transition-all duration-300 group-hover:w-full" />
-              </a>
-              <a
-                href="#catalog"
-                className="hover:text-[#C59B27] transition-colors relative py-1 group"
-              >
-                Heirloom Sarees
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C59B27] transition-all duration-300 group-hover:w-full" />
-              </a>
-              <a
-                href="#atelier"
-                className="hover:text-[#C59B27] transition-colors relative py-1 group"
-              >
-                The Atelier
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C59B27] transition-all duration-300 group-hover:w-full" />
-              </a>
-              <a
-                href="#boutiques"
-                className="hover:text-[#C59B27] transition-colors relative py-1 group"
-              >
-                Boutiques
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C59B27] transition-all duration-300 group-hover:w-full" />
-              </a>
-            </nav>
-
-            {/* Mobile Hamburger Button */}
+    <header
+      className={`sticky top-0 z-40 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl py-3.5'
+          : 'bg-[#080808] border-b border-white/[0.05] py-4'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-6">
+          {/* Mobile menu trigger */}
+          <div className="flex items-center lg:hidden">
             <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-[#C59B27] hover:text-[#F6E7B9] transition-colors"
-              aria-label="Open navigation menu"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-gray-300 hover:text-white transition-colors"
+              aria-label="Toggle navigation menu"
             >
-              <Menu className="w-6 h-6" />
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
+          </div>
 
-            {/* Center Brand Identity */}
-            <a
-              href="#"
-              className="flex flex-col items-center group text-center focus:outline-none"
+          {/* Brand Logo */}
+          <ElevaroLogo size="md" />
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-7 text-sm font-medium">
+            <Link
+              href="/"
+              className={`transition-colors tracking-wide hover:text-gold-400 ${
+                pathname === '/' ? 'text-gold-400 font-semibold' : 'text-gray-300'
+              }`}
             >
-              <div className="flex items-center space-x-1.5 mb-0.5">
-                <span className="w-4 h-[1px] bg-gradient-to-r from-transparent to-[#C59B27]" />
-                <Sparkles className="w-3.5 h-3.5 text-[#C59B27] group-hover:rotate-45 transition-transform duration-500" />
-                <span className="w-4 h-[1px] bg-gradient-to-l from-transparent to-[#C59B27]" />
-              </div>
-              <span className="font-serif text-2xl sm:text-3xl md:text-3xl tracking-[0.28em] font-semibold text-[#FDF4D4] uppercase group-hover:text-[#E7C978] transition-colors">
-                Kiran Sarees
-              </span>
-              <span className="text-[9px] tracking-[0.45em] text-[#C59B27] uppercase font-light mt-0.5">
-                Varanasi • Kanchipuram • Est. 1974
-              </span>
-            </a>
+              Home
+            </Link>
 
-            {/* Right Action Icons */}
-            <div className="flex items-center space-x-3 sm:space-x-5">
-              {/* Currency Selector */}
-              <div className="relative hidden sm:block">
-                <button
-                  onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-                  className="flex items-center space-x-1 text-xs tracking-[0.1em] text-[#ECE4D8]/80 hover:text-[#C59B27] py-1 px-2 rounded border border-[#C59B27]/25 transition-colors"
-                >
-                  <Globe className="w-3.5 h-3.5 text-[#C59B27]" />
-                  <span>{currency}</span>
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-                {currencyDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-28 bg-[#15181E] border border-[#C59B27]/30 shadow-2xl rounded py-1 z-50">
-                    {CURRENCIES.map((curr) => (
-                      <button
-                        key={curr}
-                        onClick={() => {
-                          setCurrency(curr);
-                          setCurrencyDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 text-xs tracking-wider transition-colors ${
-                          currency === curr
-                            ? 'bg-[#C59B27]/20 text-[#F6E7B9] font-medium'
-                            : 'text-[#ECE4D8]/70 hover:bg-[#C59B27]/10 hover:text-[#ECE4D8]'
-                        }`}
+            <Link
+              href="/shop"
+              className={`transition-colors tracking-wide hover:text-gold-400 ${
+                pathname === '/shop' ? 'text-gold-400 font-semibold' : 'text-gray-300'
+              }`}
+            >
+              Shop All
+            </Link>
+
+            {/* Categories Mega Menu Trigger */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsCategoryMegaMenuOpen(true)}
+              onMouseLeave={() => setIsCategoryMegaMenuOpen(false)}
+            >
+              <button
+                className={`flex items-center gap-1.5 transition-colors tracking-wide py-2 hover:text-gold-400 ${
+                  pathname.startsWith('/category') ? 'text-gold-400 font-semibold' : 'text-gray-300'
+                }`}
+              >
+                <span>Categories</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+                    isCategoryMegaMenuOpen ? 'rotate-180 text-gold-400' : ''
+                  }`}
+                />
+              </button>
+
+              {/* Mega Menu Dropdown */}
+              {isCategoryMegaMenuOpen && (
+                <div className="absolute top-full -left-20 w-[780px] bg-[#0E0E0E]/98 border border-white/[0.12] rounded-2xl shadow-2xl p-6 backdrop-blur-2xl z-50 animate-fadeIn">
+                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                        Curated Hardware Portfolios
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Engineered with aerospace materials, flagship silicon, and acoustic mastery.
+                      </p>
+                    </div>
+                    <Link
+                      href="/shop"
+                      className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1"
+                    >
+                      <span>Explore Catalog</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    {CATEGORIES.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        href={`/category/${cat.id}`}
+                        className="group/item p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.06] hover:border-gold-500/30 transition-all flex items-start gap-3"
                       >
-                        {curr}
-                      </button>
+                        <div className="w-10 h-10 rounded-lg bg-black/60 border border-white/[0.08] flex items-center justify-center shrink-0 group-hover/item:border-gold-400/50">
+                          <Layers className="w-4 h-4 text-gold-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white group-hover/item:text-gold-300 transition-colors">
+                            {cat.name}
+                          </p>
+                          <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                            {cat.itemCount} Flagship Models
+                          </p>
+                        </div>
+                      </Link>
                     ))}
                   </div>
-                )}
-              </div>
 
-              {/* Live Search */}
+                  {/* Mega Menu Footer Callout */}
+                  <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-gray-400">
+                    <span className="flex items-center gap-1.5 text-gold-400/90 font-medium">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Free 2-Day Air Express on orders over $500
+                    </span>
+                    <Link
+                      href="/compare"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Compare Flagship Specifications
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Link
+              href="/shop?sort=newest"
+              className="text-gray-300 hover:text-gold-400 transition-colors tracking-wide"
+            >
+              New Arrivals
+            </Link>
+
+            <Link
+              href="/shop?badge=BESTSELLER"
+              className="text-gray-300 hover:text-gold-400 transition-colors tracking-wide"
+            >
+              Best Sellers
+            </Link>
+
+            <Link
+              href="/shop?offers=true"
+              className="text-gold-400 hover:text-gold-300 transition-colors tracking-wide flex items-center gap-1"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Offers</span>
+            </Link>
+          </nav>
+
+          {/* Action Icons */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Global Search Trigger */}
+            <button
+              onClick={openSearch}
+              className="p-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all"
+              aria-label="Open search dialog"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Compare Bar Icon */}
+            <Link
+              href="/compare"
+              className="relative p-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all hidden sm:flex"
+              aria-label="Product comparison"
+              title="Compare Specifications"
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+              {compareList.length > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gold-500 text-black font-extrabold text-[10px] flex items-center justify-center shadow-md">
+                  {compareList.length}
+                </span>
+              )}
+            </Link>
+
+            {/* Wishlist Trigger */}
+            <button
+              onClick={openWishlist}
+              className="relative p-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all"
+              aria-label="Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-extrabold text-[10px] flex items-center justify-center shadow-md">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+
+            {/* Cart Trigger */}
+            <button
+              onClick={openCart}
+              className="relative p-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gold-400 text-black font-extrabold text-[10px] flex items-center justify-center shadow-md">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {/* User Account Dropdown */}
+            <div className="relative">
               <button
-                onClick={openSearch}
-                className="p-2 text-[#ECE4D8]/80 hover:text-[#C59B27] transition-colors"
-                title="Search Weaves & Sarees"
-                aria-label="Search"
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                className={`p-2.5 rounded-full transition-all flex items-center justify-center ${
+                  isAuthenticated
+                    ? 'text-gold-400 bg-gold-500/10 border border-gold-500/30'
+                    : 'text-gray-300 hover:text-white hover:bg-white/[0.06]'
+                }`}
+                aria-label="Account menu"
               >
-                <Search className="w-5 h-5" />
+                <User className="w-5 h-5" />
               </button>
 
-              {/* Wishlist */}
-              <button
-                onClick={openWishlist}
-                className="p-2 text-[#ECE4D8]/80 hover:text-[#C59B27] transition-colors relative"
-                title="View Wishlist"
-                aria-label="Wishlist"
-              >
-                <Heart className="w-5 h-5" />
-                {wishlist.length > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#801823] text-white text-[10px] font-bold rounded-full flex items-center justify-center border border-[#0E1013]">
-                    {wishlist.length}
-                  </span>
-                )}
-              </button>
+              {isUserDropdownOpen && (
+                <div
+                  className="absolute right-0 mt-2.5 w-60 bg-[#121212] border border-gold-500/30 rounded-2xl shadow-2xl py-2 z-50 backdrop-blur-2xl animate-fadeIn"
+                  onMouseLeave={() => setIsUserDropdownOpen(false)}
+                >
+                  {isAuthenticated && user ? (
+                    <>
+                      <div className="px-4 py-3 border-b border-white/[0.08]">
+                        <p className="text-xs text-gold-400 font-semibold tracking-wider uppercase">
+                          {user.membershipTier}
+                        </p>
+                        <p className="text-sm font-bold text-white truncate mt-0.5">
+                          {user.fullName}
+                        </p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
 
-              {/* Shopping Bag */}
-              <button
-                onClick={openCart}
-                className="p-2 text-[#ECE4D8]/80 hover:text-[#C59B27] transition-colors relative"
-                title="View Shopping Bag"
-                aria-label="Shopping Bag"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#C59B27] text-[#0E1013] text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
+                      <div className="py-1">
+                        <Link
+                          href="/account"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-200 hover:bg-white/[0.06] hover:text-gold-300 transition-colors"
+                        >
+                          <User className="w-4 h-4 text-gray-400" />
+                          <span>My Account Overview</span>
+                        </Link>
 
-              {/* Bridal Concierge CTA - Desktop */}
-              <button
-                onClick={openConsultation}
-                className="hidden xl:inline-flex items-center space-x-2 bg-gradient-to-r from-[#68131B] to-[#801823] hover:from-[#801823] hover:to-[#9b1b28] text-[#FDF4D4] border border-[#C59B27]/40 px-3.5 py-1.5 rounded text-xs tracking-[0.16em] uppercase transition-all shadow-md hover:shadow-[#C59B27]/20"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
-                <span>Book Salon</span>
-              </button>
+                        <Link
+                          href="/account?tab=orders"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-200 hover:bg-white/[0.06] hover:text-gold-300 transition-colors"
+                        >
+                          <Package className="w-4 h-4 text-gray-400" />
+                          <span>Orders & Vault Shipments</span>
+                        </Link>
+
+                        <Link
+                          href="/track-order"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-200 hover:bg-white/[0.06] hover:text-gold-300 transition-colors"
+                        >
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          <span>Live Order Tracking</span>
+                        </Link>
+
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs text-gold-400 hover:bg-white/[0.06] transition-colors border-t border-b border-white/[0.06] my-1"
+                        >
+                          <Shield className="w-4 h-4 text-gold-400" />
+                          <span className="font-semibold">Admin Command Center</span>
+                        </Link>
+
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsUserDropdownOpen(false);
+                          }}
+                          className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-3">
+                      <div className="mb-3 px-1">
+                        <p className="text-xs font-bold text-white">Elevaro Prive Membership</p>
+                        <p className="text-[11px] text-gray-400">
+                          Sign in for concierge hardware support and expedited dispatch.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Link
+                          href="/login"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="block w-full py-2 px-3 text-center text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded-lg transition-colors"
+                        >
+                          Sign In
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="block w-full py-2 px-3 text-center text-xs font-semibold text-gray-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.1] rounded-lg transition-colors border border-white/[0.08]"
+                        >
+                          Create Account
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-[#121419] border-r border-[#C59B27]/30 shadow-2xl p-6 flex flex-col justify-between z-50">
-            <div>
-              <div className="flex items-center justify-between pb-6 border-b border-[#C59B27]/20">
-                <div className="flex flex-col">
-                  <span className="font-serif text-xl tracking-[0.2em] font-semibold text-[#FDF4D4] uppercase">
-                    Kiran Sarees
-                  </span>
-                  <span className="text-[9px] tracking-[0.3em] text-[#C59B27] uppercase">
-                    Haute Handlooms
-                  </span>
-                </div>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-[#ECE4D8]/60 hover:text-white"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 top-[108px] bg-black/95 backdrop-blur-2xl z-40 border-t border-white/[0.08] overflow-y-auto px-6 py-6 animate-fadeIn">
+          <div className="flex flex-col space-y-6">
+            <div className="space-y-3">
+              <p className="text-[11px] font-bold tracking-widest text-gold-400 uppercase">
+                Explore Hardware
+              </p>
+              <Link
+                href="/"
+                className="block text-base font-semibold text-white hover:text-gold-300"
+              >
+                Home
+              </Link>
+              <Link
+                href="/shop"
+                className="block text-base font-semibold text-white hover:text-gold-300"
+              >
+                Shop All Electronics
+              </Link>
+              <Link
+                href="/shop?badge=BESTSELLER"
+                className="block text-base font-semibold text-white hover:text-gold-300"
+              >
+                Best Sellers
+              </Link>
+              <Link
+                href="/shop?sort=newest"
+                className="block text-base font-semibold text-white hover:text-gold-300"
+              >
+                New Arrivals
+              </Link>
+              <Link
+                href="/compare"
+                className="block text-base font-semibold text-gold-400 hover:text-gold-300"
+              >
+                Compare Specifications ({compareList.length})
+              </Link>
+            </div>
 
-              {/* Mobile Links */}
-              <nav className="mt-8 flex flex-col space-y-6 text-sm tracking-[0.2em] uppercase font-medium text-[#ECE4D8]/80">
-                <a
-                  href="#collections"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#C59B27] transition-colors"
-                >
-                  Collections
-                </a>
-                <a
-                  href="#catalog"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#C59B27] transition-colors"
-                >
-                  Heirloom Sarees
-                </a>
-                <a
-                  href="#atelier"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#C59B27] transition-colors"
-                >
-                  The Atelier & Craft
-                </a>
-                <a
-                  href="#real-brides"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#C59B27] transition-colors"
-                >
-                  Real Brides
-                </a>
-                <a
-                  href="#boutiques"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#C59B27] transition-colors"
-                >
-                  Flagship Boutiques
-                </a>
-              </nav>
-
-              {/* Mobile Currency Picker */}
-              <div className="mt-8 pt-6 border-t border-[#C59B27]/20">
-                <span className="text-xs text-[#C59B27] uppercase tracking-[0.2em] block mb-3">
-                  Select Currency
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {CURRENCIES.map((curr) => (
-                    <button
-                      key={curr}
-                      onClick={() => setCurrency(curr)}
-                      className={`px-2.5 py-1 text-xs rounded border transition-colors ${
-                        currency === curr
-                          ? 'border-[#C59B27] bg-[#C59B27]/20 text-[#F6E7B9] font-medium'
-                          : 'border-[#C59B27]/20 text-[#ECE4D8]/60 hover:border-[#C59B27]/40'
-                      }`}
-                    >
-                      {curr}
-                    </button>
-                  ))}
-                </div>
+            {/* Categories Mobile Grid */}
+            <div className="pt-4 border-t border-white/[0.08]">
+              <p className="text-[11px] font-bold tracking-widest text-gray-400 uppercase mb-3">
+                Categories
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={`/category/${cat.id}`}
+                    className="p-2.5 rounded-lg bg-white/[0.04] text-xs font-medium text-gray-200 hover:text-gold-300 hover:bg-white/[0.08] transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
               </div>
             </div>
 
-            {/* Mobile Footer CTAs */}
-            <div className="pt-6 border-t border-[#C59B27]/20 space-y-3">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openConsultation();
-                }}
-                className="w-full py-2.5 bg-gradient-to-r from-[#68131B] to-[#801823] text-[#FDF4D4] border border-[#C59B27]/40 rounded text-xs tracking-[0.2em] uppercase font-medium flex items-center justify-center space-x-2"
+            {/* Quick Account Links */}
+            <div className="pt-4 border-t border-white/[0.08] space-y-3">
+              <Link
+                href="/account"
+                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
               >
-                <Sparkles className="w-4 h-4 text-[#C59B27]" />
-                <span>Book Bridal Consultation</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openWhatsAppConcierge();
-                }}
-                className="w-full py-2.5 bg-[#0C3027] text-[#ECE4D8] border border-[#134E3F] rounded text-xs tracking-[0.2em] uppercase font-medium flex items-center justify-center space-x-2 hover:bg-[#134E3F] transition-colors"
+                <User className="w-4 h-4 text-gold-400" />
+                <span>My Account</span>
+              </Link>
+              <Link
+                href="/track-order"
+                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
               >
-                <PhoneCall className="w-4 h-4 text-[#C59B27]" />
-                <span>WhatsApp Stylist</span>
-              </button>
+                <Package className="w-4 h-4 text-gold-400" />
+                <span>Track Order</span>
+              </Link>
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 text-sm text-gold-400 font-semibold"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Admin Dashboard</span>
+              </Link>
             </div>
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 }

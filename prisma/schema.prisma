@@ -1,0 +1,220 @@
+// ELEVARO ELECTRONICS – Production-Grade PostgreSQL Prisma Schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  VIP_PATRON
+}
+
+enum OrderStatus {
+  PROCESSING
+  CONFIRMED
+  DISPATCHED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  STRIPE
+  RAZORPAY
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String?
+  fullName       String
+  phone          String?
+  role           Role      @default(CUSTOMER)
+  membershipTier String    @default("Elevaro Standard")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  addresses      Address[]
+  orders         Order[]
+  reviews        Review[]
+  wishlist       WishlistItem[]
+
+  @@index([email])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName   String
+  phone      String
+  street     String
+  apartment  String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders     Order[]
+
+  @@index([userId])
+}
+
+model Category {
+  id          String    @id
+  slug        String    @unique
+  name        String
+  tagline     String
+  description String
+  image       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id                 String    @id @default(cuid())
+  slug               String    @unique
+  name               String
+  brand              String
+  categoryId         String
+  category           Category  @relation(fields: [categoryId], references: [id])
+  price              Decimal   @db.Decimal(10, 2)
+  originalPrice      Decimal   @db.Decimal(10, 2)
+  discountPercentage Int       @default(0)
+  rating             Decimal   @default(5.0) @db.Decimal(3, 2)
+  reviewCount        Int       @default(0)
+  inStock            Boolean   @default(true)
+  stockCount         Int       @default(10)
+  badge              String?
+  shortDescription   String
+  fullDescription    String
+  keyFeatures        String[]
+  specs              Json
+  images             String[]
+  colors             Json?
+  variants           Json?
+  isFeatured         Boolean   @default(false)
+  isBestSeller       Boolean   @default(false)
+  isNewArrival       Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  orderItems         OrderItem[]
+  reviews            Review[]
+  wishlistItems      WishlistItem[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([brand])
+}
+
+model Order {
+  id                 String        @id @default(cuid())
+  orderNumber        String        @unique
+  userId             String?
+  user               User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status             OrderStatus   @default(PROCESSING)
+  subtotal           Decimal       @db.Decimal(10, 2)
+  discount           Decimal       @default(0) @db.Decimal(10, 2)
+  shippingFee        Decimal       @default(0) @db.Decimal(10, 2)
+  total              Decimal       @db.Decimal(10, 2)
+  currency           String        @default("USD")
+  shippingAddressId  String
+  shippingAddress    Address       @relation(fields: [shippingAddressId], references: [id])
+  paymentMethod      PaymentMethod @default(STRIPE)
+  paymentStatus      PaymentStatus @default(PENDING)
+  trackingNumber     String?
+  courierName        String?       @default("FedEx Priority White-Glove")
+  estimatedDelivery  String?
+  trackingEvents     Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  items              OrderItem[]
+
+  @@index([orderNumber])
+  @@index([userId])
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  quantity        Int      @default(1)
+  unitPrice       Decimal  @db.Decimal(10, 2)
+  selectedColor   String?
+  selectedVariant String?
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Review {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId           String?
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName         String
+  rating           Int      @default(5)
+  title            String
+  comment          String
+  verifiedPurchase Boolean  @default(true)
+  helpfulCount     Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType @default(PERCENTAGE)
+  discountValue Decimal      @db.Decimal(10, 2)
+  minPurchase   Decimal      @default(0) @db.Decimal(10, 2)
+  description   String
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  timesUsed     Int          @default(0)
+  createdAt     DateTime     @default(now())
+
+  @@index([code])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}

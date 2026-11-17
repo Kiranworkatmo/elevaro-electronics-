@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useShop } from '@/context/ShopContext';
 import { X, Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 
@@ -9,9 +11,9 @@ export default function WishlistDrawer() {
     wishlist,
     isWishlistOpen,
     closeWishlist,
-    toggleWishlist,
+    removeFromWishlist,
     addToCart,
-    formatPrice
+    formatPrice,
   } = useShop();
 
   if (!isWishlistOpen) return null;
@@ -19,101 +21,117 @@ export default function WishlistDrawer() {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
         onClick={closeWishlist}
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#12151B] border-l border-[#C59B27]/30 shadow-2xl flex flex-col justify-between">
+        <div className="w-screen max-w-md bg-[#0F0F0F] border-l border-white/[0.1] shadow-2xl flex flex-col">
           {/* Header */}
-          <div className="p-6 border-b border-[#C59B27]/20 flex items-center justify-between bg-[#0E1013]">
-            <div className="flex items-center space-x-2">
-              <Heart className="w-5 h-5 text-[#801823] fill-current" />
-              <h2 className="font-serif text-lg tracking-[0.16em] uppercase text-[#FDF4D4] font-medium">
-                Saved Heirlooms
+          <div className="p-5 border-b border-white/[0.08] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-rose-500 fill-current" />
+              <h2 className="text-base font-bold text-white tracking-wide">
+                Saved Wishlist ({wishlist.length})
               </h2>
-              <span className="text-xs text-[#C59B27] font-semibold font-mono">
-                ({wishlist.length})
-              </span>
             </div>
             <button
               onClick={closeWishlist}
-              className="p-2 text-[#ECE4D8]/60 hover:text-white transition-colors"
+              className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/[0.06]"
               aria-label="Close wishlist"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* List */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {wishlist.length === 0 ? (
-              <div className="text-center py-20">
-                <Heart className="w-12 h-12 text-[#C59B27]/30 mx-auto mb-3" />
-                <h3 className="font-serif text-xl text-[#FDF4D4] font-medium mb-2">
-                  No Saved Pieces
-                </h3>
-                <p className="text-xs text-[#ECE4D8]/60 font-light mb-6 max-w-xs mx-auto">
-                  Click the heart icon on any saree to save it for your private trousseau review.
+              <div className="text-center py-16 flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-gray-500 mb-4">
+                  <Heart className="w-8 h-8" />
+                </div>
+                <h3 className="text-sm font-bold text-white">Your Wishlist is Empty</h3>
+                <p className="text-xs text-gray-400 max-w-xs mt-1.5 leading-relaxed">
+                  Save your desired luxury laptops, audio transducers, and smartphones to track availability.
                 </p>
                 <button
                   onClick={closeWishlist}
-                  className="px-6 py-2.5 bg-[#C59B27] text-[#0E1013] text-xs font-semibold tracking-[0.2em] uppercase rounded shadow-lg"
+                  className="mt-6 py-2.5 px-6 rounded-xl bg-gold-400 hover:bg-gold-300 text-black font-bold text-xs tracking-wider uppercase transition-colors"
                 >
-                  Explore Collection
+                  Explore Electronics
                 </button>
               </div>
             ) : (
-              wishlist.map((saree) => (
+              wishlist.map((product) => (
                 <div
-                  key={saree.id}
-                  className="p-4 rounded-lg bg-[#0E1013] border border-[#C59B27]/20 flex gap-4"
+                  key={product.id}
+                  className="flex gap-4 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-colors"
                 >
-                  <img
-                    src={saree.images.main}
-                    alt={saree.name}
-                    className="w-20 h-24 object-cover object-center rounded border border-[#C59B27]/25 flex-shrink-0"
-                  />
+                  <div className="relative w-20 h-20 rounded-lg bg-[#181818] overflow-hidden shrink-0">
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                  </div>
 
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between">
-                        <span className="text-[10px] text-[#C59B27] uppercase tracking-wider font-medium">
-                          {saree.weave}
-                        </span>
-                        <button
-                          onClick={() => toggleWishlist(saree)}
-                          className="text-[#ECE4D8]/40 hover:text-red-400 transition-colors p-1"
-                          title="Remove"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      <h4 className="font-serif text-sm text-[#FDF4D4] font-medium line-clamp-1 mt-0.5">
-                        {saree.name}
-                      </h4>
-
-                      <span className="font-serif text-sm text-[#F6E7B9] font-medium block mt-1">
-                        {formatPrice(saree.priceINR)}
-                      </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        href={`/product/${product.slug}`}
+                        onClick={closeWishlist}
+                        className="text-xs font-bold text-white hover:text-gold-300 transition-colors line-clamp-1"
+                      >
+                        {product.name}
+                      </Link>
+                      <button
+                        onClick={() => removeFromWishlist(product.id)}
+                        className="text-gray-400 hover:text-rose-400 transition-colors p-1"
+                        aria-label="Remove"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        addToCart(saree);
-                        toggleWishlist(saree);
-                      }}
-                      className="mt-3 py-1.5 px-3 bg-[#C59B27] hover:bg-[#dfbd6e] text-[#0E1013] text-[11px] font-semibold tracking-[0.16em] uppercase rounded flex items-center justify-center space-x-1.5 transition-colors"
-                    >
-                      <ShoppingBag className="w-3 h-3" />
-                      <span>Move to Bag</span>
-                    </button>
+                    <p className="text-[11px] text-gray-400 mt-0.5">{product.brand}</p>
+                    <p className="text-xs font-bold text-gold-400 mt-1">
+                      {formatPrice(product.price)}
+                    </p>
+
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          addToCart(product, 1);
+                          removeFromWishlist(product.id);
+                        }}
+                        className="py-1.5 px-3 rounded-lg bg-gold-400 hover:bg-gold-300 text-black font-bold text-[11px] transition-colors flex items-center gap-1.5"
+                      >
+                        <ShoppingBag className="w-3 h-3" />
+                        <span>Move to Cart</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
             )}
           </div>
+
+          {/* Footer */}
+          {wishlist.length > 0 && (
+            <div className="p-5 border-t border-white/[0.08] bg-[#121212]">
+              <Link
+                href="/wishlist"
+                onClick={closeWishlist}
+                className="w-full py-3 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-white font-bold text-xs tracking-wider uppercase transition-colors flex items-center justify-center gap-2 border border-white/[0.08]"
+              >
+                <span>View Full Wishlist Page</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
